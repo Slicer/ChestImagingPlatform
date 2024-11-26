@@ -31,6 +31,7 @@ TransformToStrainFilter< TTransform, TOperatorValue, TOutputValue >
   m_StrainForm( INFINITESIMAL )
 {
   m_DeformationTensor = false;
+  this->DynamicMultiThreadingOff();
 }
 
 template < typename TTransform, typename TOperatorValue,

@@ -37,6 +37,7 @@ PFNLMFilter< TInputImage, TOutputImage >
 	m_PSTh          = 2.3f;
 	m_RSearch.Fill(5);
 	m_RComp.Fill(2);
+	this->DynamicMultiThreadingOff();
 }
 
 template< class TInputImage, class TOutputImage >

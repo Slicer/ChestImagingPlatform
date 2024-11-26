@@ -33,6 +33,7 @@ BinaryFunctorImageFilter2< TInputImage1, TInputImage2, TOutputImage >
 {
   this->SetNumberOfRequiredInputs(2);
   this->InPlaceOff();
+  this->DynamicMultiThreadingOff();
 }
 
 /**

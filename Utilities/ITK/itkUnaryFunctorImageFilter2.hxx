@@ -33,6 +33,7 @@ UnaryFunctorImageFilter2< TInputImage, TOutputImage >
 {
   this->SetNumberOfRequiredInputs(1);
   this->InPlaceOff();
+  this->DynamicMultiThreadingOff();
 }
 
 /**

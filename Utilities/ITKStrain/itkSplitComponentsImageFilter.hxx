@@ -39,6 +39,8 @@ SplitComponentsImageFilter< TInputImage, TOutputImage, TComponents >
     {
     this->SetNthOutput( i, this->MakeOutput( i ) );
     }
+
+  this->DynamicMultiThreadingOff();
 }
 
 

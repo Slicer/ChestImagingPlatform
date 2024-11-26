@@ -47,6 +47,8 @@ StrainImageFilter< TInputImage, TOperatorValueType, TOutputValueType >
   this->m_GradientFilter = GradientImageFilterType::New().GetPointer();
   
   m_DeformationTensor = false;
+  
+  this->DynamicMultiThreadingOff();
 
 }
 

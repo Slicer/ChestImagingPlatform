@@ -37,6 +37,7 @@ LSDerivativesL0< TInputImage >
 {
 	m_Radius     = 2;
 	m_Coordinate = 0;
+	this->DynamicMultiThreadingOff();
 }
 
 template< unsigned int ImageDimension >
@@ -45,6 +46,7 @@ LSDerivativesL1< ImageDimension >
 {
 	m_Radius     = 2;
 	m_Coordinate = 1;
+	this->DynamicMultiThreadingOff();
 }
 
 template< unsigned int ImageDimension >
@@ -53,6 +55,7 @@ LSDerivativesL2< ImageDimension >
 {
 	m_Radius     = 2;
 	m_Coordinate = 2;
+	this->DynamicMultiThreadingOff();
 }
 //=====================================================================================================	
 
