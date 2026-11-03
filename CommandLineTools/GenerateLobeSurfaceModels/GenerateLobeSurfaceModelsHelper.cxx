@@ -1,4 +1,5 @@
 #include "GenerateLobeSurfaceModelsHelper.h"
+#include <vnl/algo/vnl_symmetric_eigensystem.h>
 
 void WriteTransformToFile( TransformType::Pointer transform, std::string fileName )
 {
