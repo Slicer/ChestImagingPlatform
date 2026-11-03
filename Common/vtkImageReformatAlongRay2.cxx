@@ -24,6 +24,7 @@
 #include "teem/ell.h"
 
 #include <math.h>
+#include <iostream>
 
 vtkStandardNewMacro(vtkImageReformatAlongRay2);
 
@@ -114,7 +115,7 @@ void vtkImageReformatAlongRay2::ExecuteDataWithInformation(vtkDataObject *out,
   vtkImageData *output = this->GetOutput();
   output->AllocateScalars(outInfo);
   //vtkIndent ident;
-  //output->PrintSelf(cout,ident);
+  //output->PrintSelf(std::cout,ident);
 
   // Convert input to nrrd
   int dims[3];
@@ -141,7 +142,7 @@ void vtkImageReformatAlongRay2::ExecuteDataWithInformation(vtkDataObject *out,
   }
  
   if(nrrdWrap_nva(this->nin,data,type,3,size)) {
-	cout<<"Error with nrrdWrap"<<endl;
+	std::cout<<"Error with nrrdWrap"<<std::endl;
         //sprintf(err,"%s:",me);
 	//biffAdd(NRRD, err); return;
   }

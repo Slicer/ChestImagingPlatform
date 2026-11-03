@@ -24,6 +24,7 @@
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkNRRDExport.h"
+#include <iostream>
 
 vtkStandardNewMacro(vtkTubularScalePolyDataFilter);
 
@@ -80,7 +81,7 @@ int vtkTubularScalePolyDataFilter::RequestData(vtkInformation *request,
   double sp[3], org[3];
   inData->GetSpacing(sp);
   inData->GetOrigin(org);
-  cout<<"org: "<<org[0]<<" "<<org[1]<<" "<<org[2]<<endl;
+  std::cout<<"org: "<<org[0]<<" "<<org[1]<<" "<<org[2]<<std::endl;
   
   vtkPoints *newPts = vtkPoints::New();
   vtkDoubleArray *scaleArray = vtkDoubleArray::New();
@@ -114,7 +115,7 @@ int vtkTubularScalePolyDataFilter::RequestData(vtkInformation *request,
   if (E) {
     //vtkErrorMacro("Error Setting Gage Context... Leaving Execute");
     //Delete local objects
-    cout<<"Error Setting Gage Context... Leaving Execute"<<endl;
+    std::cout<<"Error Setting Gage Context... Leaving Execute"<<std::endl;
     gageContextNix(gtx);
     nrrdexport->Delete();
     return 0;
@@ -142,7 +143,7 @@ int vtkTubularScalePolyDataFilter::RequestData(vtkInformation *request,
   vtkIdType npts = 0;
   vtkIdType *pts = 0;
   inLines->InitTraversal();
-  cout<<" Num cells: :"<<inLines->GetNumberOfCells()<<endl;
+  std::cout<<" Num cells: :"<<inLines->GetNumberOfCells()<<std::endl;
   for (int i = 0; i<inLines->GetNumberOfCells();i++) {
     //Get list point in cell
     inLines->GetNextCell(npts,pts);
@@ -157,10 +158,10 @@ int vtkTubularScalePolyDataFilter::RequestData(vtkInformation *request,
         coord[k]=ijk[k]+pcoords[k];
         coord[k]=(xyzin[k]-org[k])/sp[k];
       }
-      //cout<<"flag: "<<flag<<" pid: "<<pts[j]<<" "<<xyzin[0]<<" "<<xyzin[1]<<" "<<xyzin[2]<<endl;
-      //cout<<"ijk: "<<ijk[0]<<" "<<ijk[1]<<" "<<ijk[2]<<endl;
+      //std::cout<<"flag: "<<flag<<" pid: "<<pts[j]<<" "<<xyzin[0]<<" "<<xyzin[1]<<" "<<xyzin[2]<<std::endl;
+      //std::cout<<"ijk: "<<ijk[0]<<" "<<ijk[1]<<" "<<ijk[2]<<std::endl;
       scale = helper->ScaleSelection(gtx,pvl,coord,initScale,finalScale,scaleStep);
-      //cout<<"coords: "<<coord[0]<<" "<<coord[1]<<" "<<coord[2]<<" Scale: "<<scale<<endl;
+      //std::cout<<"coords: "<<coord[0]<<" "<<coord[1]<<" "<<coord[2]<<" Scale: "<<scale<<std::endl;
 
       scaleArray->SetValue(pts[j],scale);
       }  
@@ -179,7 +180,7 @@ void vtkTubularScalePolyDataFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "running class: "<<this->GetClassName()<<endl;
+  os << indent << "running class: "<<this->GetClassName()<<std::endl;
 
 }
 

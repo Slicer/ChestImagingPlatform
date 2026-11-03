@@ -7,6 +7,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include <iostream>
 
 #define VTK_NUM_DIMENSIONS 3
 
@@ -426,7 +427,7 @@ void vtkImageKernelSource::ThreadedFourierCenterExecute(vtkImageData *inData,
         this->ComputeInputIndex(outIndx,mid,inIndx);
         inPtr = (double *) inData->GetScalarPointer(inIndx[0],inIndx[1],inIndx[2]);
         if (inPtr == NULL) {
-          cout<<"Error in fftshift: index out out boundaries"<<endl;
+          std::cout<<"Error in fftshift: index out out boundaries"<<std::endl;
           continue;
         }
 

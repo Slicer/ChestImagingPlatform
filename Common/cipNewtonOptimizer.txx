@@ -13,6 +13,7 @@
 #include "cipNewtonOptimizer.h"
 #include <vnl/algo/vnl_matrix_inverse.h>
 #include <vnl/algo/vnl_symmetric_eigensystem.h>
+#include <iostream>
 
 
 template < unsigned int Dimension >
@@ -97,7 +98,7 @@ void cipNewtonOptimizer< Dimension >::Update( bool verbose )
         std::abs(d[1])*outer_product(v.get_column(1),v.get_column(1));
       }
 
-    (*hInv) =  vnl_matrix_inverse<double>(h);    
+    (*hInv) =  vnl_matrix_inverse<double>(h).as_matrix();    
 
     (*p) = -(*hInv)*(*g); // Newton step    
     
@@ -123,7 +124,7 @@ void cipNewtonOptimizer< Dimension >::Update( bool verbose )
     if ( verbose )
       {
       std::cout << "Dimension:\t" << Dimension << std::endl;
-      std::cout << "this->GradientTolerance:\t" << this->GradientTolerance << std::endl;
+      std::cout << "this->GradientDifferenceTolerance:\t" << this->GradientDifferenceTolerance << std::endl;
       std::cout << "this->OptimalValue:\t" << this->OptimalValue << std::endl;
       std::cout << "Hessian:\t" << h[0][0] << "\t" << h[0][1] << "\t" << h[1][0] << "\t" << h[1][1] << "\t" << std::endl;
       std::cout << "Hessian Inv:\t" << (*hInv)[0][0] << "\t" << (*hInv)[0][1] << "\t" << (*hInv)[1][0] << "\t" << (*hInv)[1][1] << "\t" << std::endl;
@@ -187,7 +188,7 @@ void cipNewtonOptimizer< Dimension >::Update()
         std::abs(d[1])*outer_product(v.get_column(1),v.get_column(1));
       }
 
-    (*hInv) =  vnl_matrix_inverse<double>(h);    
+    (*hInv) =  vnl_matrix_inverse<double>(h).as_matrix();    
 
     (*p) = -(*hInv)*(*g); // Newton step    
     

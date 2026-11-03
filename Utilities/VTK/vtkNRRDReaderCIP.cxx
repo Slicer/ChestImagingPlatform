@@ -50,6 +50,7 @@
 
 // Teem includes
 #include "teem/ten.h"
+#include <iostream>
 
 vtkStandardNewMacro(vtkNRRDReaderCIP);
 
@@ -1013,7 +1014,7 @@ void vtkNRRDReaderCIP::ExecuteDataWithInformation(vtkDataObject *output, vtkInfo
 
        const char *key = 0;
        int E;
-       cout<<"Kind: Masked Sym Matrix"<<endl;
+       std::cout<<"Kind: Masked Sym Matrix"<<std::endl;
        // Call tendExpand(nout,nin,scale,threshold)
        // Set up threshold to -1 to avoid this
        Nrrd *ntmp = nrrdNew();

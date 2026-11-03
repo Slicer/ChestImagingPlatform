@@ -37,6 +37,7 @@
 
 #include "teem/nrrd.h"
 #include "teem/gage.h"
+#include <iostream>
 
 #define VTK_EPS 1e-12
 
@@ -193,7 +194,7 @@ int vtkExtractAirwayTree::RequestData(vtkInformation* vtkNotUsed(request),
     scaleAtSeed = 2;
   }
   double scale = scaleAtSeed;
-  cout<<"Tracking at Optimal scale: "<<scale<<endl;
+  std::cout<<"Tracking at Optimal scale: "<<scale<<std::endl;
 
   // Setting up the context and the state according to the estimated scaled.
   if (this->SettingContextAndState(gtx,pvl,state,scaleAtSeed)) {
@@ -215,7 +216,7 @@ int vtkExtractAirwayTree::RequestData(vtkInformation* vtkNotUsed(request),
   newS[2]=this->Seed[2];
   this->RelocateSeed(gtx,pvl,newS,newS);
   scale = this->ScaleSelection(gtx,pvl,newS,2.0,10.0,0.1);
-  cout<<"New scale: "<<scale<<endl;
+  std::cout<<"New scale: "<<scale<<std::endl;
   kparm[0] = floor(scale);
   if (!E) E |= gageKernelSet(gtx, gageKernel00, nrrdKernelBCCubic, kparm);
   if (!E) E |= gageKernelSet(gtx, gageKernel11, nrrdKernelBCCubicD, kparm);
@@ -269,7 +270,7 @@ int vtkExtractAirwayTree::RequestData(vtkInformation* vtkNotUsed(request),
       //3. ApplyUpdate
       //4. Apply Constrain: seed should be in a minimum
 
-      //cout<<"NEW STEP: Direction "<<direction[forward]<<"  ----"<<endl;
+      //std::cout<<"NEW STEP: Direction "<<direction[forward]<<"  ----"<<std::endl;
       // Probing should be always done like this:
       state->Update(newS); //Save state at k-1, probe at k and compute direction of evolution
 
@@ -284,7 +285,7 @@ int vtkExtractAirwayTree::RequestData(vtkInformation* vtkNotUsed(request),
             // No good scale was found. Let us break here
             break;
           }
-          cout<<"Stop Condition Optimal scale: "<<scale<<endl;
+          std::cout<<"Stop Condition Optimal scale: "<<scale<<std::endl;
           if (this->SettingContextAndState(gtx,pvl,state,scale)) 
             {
             vtkErrorMacro("Error Setting Gage Context... Leaving Execute");
@@ -300,13 +301,13 @@ int vtkExtractAirwayTree::RequestData(vtkInformation* vtkNotUsed(request),
           // If condition is stop, break, if not, keep moving.
           if (this->StoppingCondition(state) == STOP)
             {
-            //cout<<"Bailing out..."<<endl;
+            //std::cout<<"Bailing out..."<<std::endl;
             break;
             }
           }
         else 
           {
-          //cout<<"Bailing out..."<<endl;
+          //std::cout<<"Bailing out..."<<std::endl;
           break;
           }
         }
@@ -315,13 +316,13 @@ int vtkExtractAirwayTree::RequestData(vtkInformation* vtkNotUsed(request),
                               state->Seed[2]);
 
       // Apply new Update
-      cout<<"Seed in state (before step): "<<state->Seed[0]<<" "<<state->Seed[1]<<" "<<state->Seed[2]<<endl;
+      std::cout<<"Seed in state (before step): "<<state->Seed[0]<<" "<<state->Seed[1]<<" "<<state->Seed[2]<<std::endl;
       this->ApplyUpdate(state,newS);
-      cout<<"Seed after taking step: "<<newS[0]<<" "<<newS[1]<<" "<<newS[2]<<endl;
-      cout<<"State direction: "<<state->direction<<endl;
+      std::cout<<"Seed after taking step: "<<newS[0]<<" "<<newS[1]<<" "<<newS[2]<<std::endl;
+      std::cout<<"State direction: "<<state->direction<<std::endl;
       //Move the seed to the minimum in the d Dim -plane
       this->RelocateSeed(gtx,pvl,newS,newS);
-      cout<<"Seed after relocation: "<<newS[0]<<" "<<newS[1]<<" "<<newS[2]<<endl;
+      std::cout<<"Seed after relocation: "<<newS[0]<<" "<<newS[1]<<" "<<newS[2]<<std::endl;
 
       numIter++;
     }while(numIter < 2*ITERMAX);
@@ -339,8 +340,8 @@ int vtkExtractAirwayTree::RequestData(vtkInformation* vtkNotUsed(request),
   //NrrdIoState *nio = nrrdIoStateNew();
   //nrrdSave("test.nrrd",nin,nio); 
   //nrrdNix(nin);
-  cout<<"Num points backwards: "<<npts[1]<<endl;
-  cout<<"Num points forward: "<<npts[2]-npts[1]<<endl;
+  std::cout<<"Num points backwards: "<<npts[1]<<std::endl;
+  std::cout<<"Num points forward: "<<npts[2]-npts[1]<<std::endl;
   vtkDebugMacro(<<"Created: " 
                << newPts->GetNumberOfPoints() << " points, " 
                << newPolys->GetNumberOfCells() << " lines");
@@ -444,7 +445,7 @@ int vtkExtractAirwayTree::StoppingCondition(vtkTrackingState *state)
   input->GetDimensions(dims);
   for (int k=0; k<3; k++) {
     if (state->Seed[k] >=dims[k] || state->Seed[k]<0) {
-      cout<<"Point is a out-of-bounds"<<endl;
+      std::cout<<"Point is a out-of-bounds"<<std::endl;
       return STOP;
     }
   } 
@@ -461,36 +462,36 @@ int vtkExtractAirwayTree::StoppingCondition(vtkTrackingState *state)
                     pow((grad[0]*hevec[6]+grad[1]*hevec[7]+grad[2]*hevec[8]),2));
   }
 
-    cout<<"Stopping criteria: 1. Orth: "<<orth<<"   2. Mode: "<<mode<<"  heval[1]: "<<heval[1]<<endl;
+    std::cout<<"Stopping criteria: 1. Orth: "<<orth<<"   2. Mode: "<<mode<<"  heval[1]: "<<heval[1]<<std::endl;
       
   // Conditions for being a generalized minimum
   if (featureSign*heval[1] < 0) {
-    cout<<"Not a valley"<<endl;
+    std::cout<<"Not a valley"<<std::endl;
     return STOP;
    }
 
   if (orth > 0.05) {
-    cout<<"Gradient not orthogonal to tube frame"<<endl;
+    std::cout<<"Gradient not orthogonal to tube frame"<<std::endl;
     return STOP;
     }
 
    // Conditions for being a strong valley
    if (featureSign*heval[1] < fabs(heval[2])) {
-     cout <<"Weak valley:"<<endl;
+     std::cout <<"Weak valley:"<<std::endl;
      return STOP;
    }
 
   // I THINK THAT FOR "STRENGTH" OF A RIDGE LINE
   // WE SHOULD TEST FOR:
   //if (featureSign*heval[1] < fabs(heval[0])) {
-  //    cout <<"Weak valley:"<<endl;
+  //    std::cout <<"Weak valley:"<<std::endl;
   //    return STOP;
   //  }
 
 
       
    //if (mode >= 0) {
-   //  cout<<"Mode change sign: potential branch"<<endl;
+   //  std::cout<<"Mode change sign: potential branch"<<std::endl;
    //  return STOP;
    // }
 
@@ -498,7 +499,7 @@ int vtkExtractAirwayTree::StoppingCondition(vtkTrackingState *state)
   // Mode can be positive and this could mean that this is a
   // weak tube, for example for large airway (bronchus)
   //  if (-1.0*featureSign*mode< this->ModeThreshold) {
-  //    cout<<"Potenial branch"<<endl; 
+  //    std::cout<<"Potenial branch"<<std::endl; 
   //    return STOP;
   //   }
 
@@ -515,25 +516,25 @@ void vtkExtractAirwayTree::PrintState(vtkTrackingState *state)
   const double *grad = state->grad;
   double *newS = state->Seed;
   double mode= this->Mode(heval);
-      cout<<"Probing Seed: "<<newS[0]<<" "<<newS[1]<<" "<<newS[2]<<endl; 
-      cout<<"Hessian eval: "<<heval[0]<<" "<<heval[1]<<" "<<heval[2]<<endl;
-      cout<<"Hessian ev1: "<<hevec[0]<<" "<<hevec[1]<<" "<<hevec[2]<<endl;
-      cout<<"Hessian ev2: "<<hevec[3]<<" "<<hevec[4]<<" "<<hevec[5]<<endl;
-      cout<<"Hessian ev3: "<<hevec[6]<<" "<<hevec[7]<<" "<<hevec[8]<<endl;
-      cout<<"Gradient: "<<grad[0]<<" "<<grad[1]<<" "<<grad[2]<<endl;
-      cout<<"Mode: "<<mode<<endl;
-      cout<<"Direction: "<<state->direction<<endl;
+      std::cout<<"Probing Seed: "<<newS[0]<<" "<<newS[1]<<" "<<newS[2]<<std::endl; 
+      std::cout<<"Hessian eval: "<<heval[0]<<" "<<heval[1]<<" "<<heval[2]<<std::endl;
+      std::cout<<"Hessian ev1: "<<hevec[0]<<" "<<hevec[1]<<" "<<hevec[2]<<std::endl;
+      std::cout<<"Hessian ev2: "<<hevec[3]<<" "<<hevec[4]<<" "<<hevec[5]<<std::endl;
+      std::cout<<"Hessian ev3: "<<hevec[6]<<" "<<hevec[7]<<" "<<hevec[8]<<std::endl;
+      std::cout<<"Gradient: "<<grad[0]<<" "<<grad[1]<<" "<<grad[2]<<std::endl;
+      std::cout<<"Mode: "<<mode<<std::endl;
+      std::cout<<"Direction: "<<state->direction<<std::endl;
 
-      cout<<"Tangent: "<<state->Seed[0]-state->PSeed[0]<<" "<<state->Seed[1]-state->PSeed[1]<<" "<<state->Seed[2]-state->PSeed[2]<<endl;
-      cout<<"Step: "<<state->hevec[6]<<" "<<state->hevec[7]<<" "<<state->hevec[8]<<endl;
-      cout<<"Inner product: "<<(state->Seed[0]-state->PSeed[0])*state->hevec[6] + 
+      std::cout<<"Tangent: "<<state->Seed[0]-state->PSeed[0]<<" "<<state->Seed[1]-state->PSeed[1]<<" "<<state->Seed[2]-state->PSeed[2]<<std::endl;
+      std::cout<<"Step: "<<state->hevec[6]<<" "<<state->hevec[7]<<" "<<state->hevec[8]<<std::endl;
+      std::cout<<"Inner product: "<<(state->Seed[0]-state->PSeed[0])*state->hevec[6] + 
                      (state->Seed[1]-state->PSeed[1])*state->hevec[7] +
-                     (state->Seed[2]-state->PSeed[2])*state->hevec[8]<<endl;
+                     (state->Seed[2]-state->PSeed[2])*state->hevec[8]<<std::endl;
 }
 
 int vtkExtractAirwayTree::RelocateSeed(gageContext *gtx, gagePerVolume *pvl, double Seed[3], double SeedNew[3])
 {
-//cout<<"RelocateSeed"<<endl;
+//std::cout<<"RelocateSeed"<<std::endl;
   double m[9], m2[9];
   double gradp[3];
   double lgrad;
@@ -611,7 +612,7 @@ int vtkExtractAirwayTree::RelocateSeed(gageContext *gtx, gagePerVolume *pvl, dou
     xn[0] = x[0]-step*gradp[0];
     xn[1] = x[1]-step*gradp[1];
     xn[2] = x[2]-step*gradp[2];
-    //cout<<"New Point: "<<x[0]<<" "<<x[1]<<" "<<x[2]<<endl;
+    //std::cout<<"New Point: "<<x[0]<<" "<<x[1]<<" "<<x[2]<<std::endl;
     gageProbe(gtx,xn[0],xn[1],xn[2]);
     if ((featureSign*prevv - featureSign*(double) valu[0]) < 0) 
      {
@@ -653,7 +654,7 @@ return converge;
 int vtkExtractAirwayTree::RelocateSeedInPlane(gageContext *gtx, gagePerVolume *pvl, double Seed[3], double SeedNew[3],int axis)
 {
 
-//cout<<"Relocate Seed In Plane"<<endl;
+//std::cout<<"Relocate Seed In Plane"<<std::endl;
   double m[9];
   double gradp[3];
   double lgrad;
@@ -691,7 +692,7 @@ int vtkExtractAirwayTree::RelocateSeedInPlane(gageContext *gtx, gagePerVolume *p
   double x[3],xn[3];
   double normal[3];
   x[0]=Seed[0];x[1]=Seed[1];x[2]=Seed[2];
-  //cout<<"Init Poinit: "<<x[0]<<" "<<x[1]<<" "<<x[2]<<endl;
+  //std::cout<<"Init Poinit: "<<x[0]<<" "<<x[1]<<" "<<x[2]<<std::endl;
   gageProbe(gtx,x[0],x[1],x[2]);
 
   normal[0] = 0.0;
@@ -734,13 +735,13 @@ int vtkExtractAirwayTree::RelocateSeedInPlane(gageContext *gtx, gagePerVolume *p
     xn[0] = x[0]-step*gradp[0];
     xn[1] = x[1]-step*gradp[1];
     xn[2] = x[2]-step*gradp[2];
-    //cout<<"GRad p: "<<gradp[0]<<" "<<gradp[1]<<" "<<gradp[2]<<" lgrad: "<<lgrad<<endl;
-    //cout<<"Delta: "<<delta<<"  New Point: "<<xn[0]<<" "<<xn[1]<<" "<<xn[2]<<"  Value: "<<valu[0]<<endl;
+    //std::cout<<"GRad p: "<<gradp[0]<<" "<<gradp[1]<<" "<<gradp[2]<<" lgrad: "<<lgrad<<std::endl;
+    //std::cout<<"Delta: "<<delta<<"  New Point: "<<xn[0]<<" "<<xn[1]<<" "<<xn[2]<<"  Value: "<<valu[0]<<std::endl;
     gageProbe(gtx,xn[0],xn[1],xn[2]);
     if ((featureSign*prevv - featureSign*(double) valu[0]) < 0) {
       hack = hack/2;
       numIter++;
-      //cout<<"Step update: "<<step<<endl;
+      //std::cout<<"Step update: "<<step<<std::endl;
       continue;
     }
     if (fabs(featureSign*prevv - featureSign*(double) valu[0]) < 0.001 || fabs(step)<0.0001) {
@@ -826,7 +827,7 @@ double vtkExtractAirwayTree::ScaleSelection(gageContext *gtx, gagePerVolume *pvl
     //heval = gageAnswerPointer(gtx, pvl, gageSclHessEval);
     gageProbe(gtx,Seed[0],Seed[1],Seed[2]);
 
-    //cout<<"Testing Scale: "<<S<<"  Eigenvalues: "<<heval[0]<<" "<<heval[1]<<" "<<heval[2]<<"  Mode: "<<this->Mode(heval)<<"  Disparity measure: "<< (heval[0] + heval[1])/2 - fabs(heval[2])<<endl;
+    //std::cout<<"Testing Scale: "<<S<<"  Eigenvalues: "<<heval[0]<<" "<<heval[1]<<" "<<heval[2]<<"  Mode: "<<this->Mode(heval)<<"  Disparity measure: "<< (heval[0] + heval[1])/2 - fabs(heval[2])<<std::endl;
     
     //Normalized strenght: multiply for scale square
     nextV = S*S*featureSign*this->Strength(heval);
@@ -841,13 +842,13 @@ double vtkExtractAirwayTree::ScaleSelection(gageContext *gtx, gagePerVolume *pvl
     } else {
         strength[idx]=0;
     }
-   //cout<<"Scale: "<<S<<" Mode: "<<nextV<<" h[0]: "<<heval[0]<<" h[1]: "<<heval[1]<<" h[2]: "<<heval[2]<<endl;
+   //std::cout<<"Scale: "<<S<<" Mode: "<<nextV<<" h[0]: "<<heval[0]<<" h[1]: "<<heval[1]<<" h[2]: "<<heval[2]<<std::endl;
 
 
     S = S+deltaS;
      idx++;
      } while( S <= maxS);
-   //cout<<"Sopt: "<<Sopt<<"  prevV: "<<prevV<<endl;
+   //std::cout<<"Sopt: "<<Sopt<<"  prevV: "<<prevV<<std::endl;
 
     S = initS;
     idx = 0;
@@ -861,7 +862,7 @@ double vtkExtractAirwayTree::ScaleSelection(gageContext *gtx, gagePerVolume *pvl
       S = S + deltaS;
       idx++;
     } while (S<=Sopt);
-    //cout<<"Sopt2: "<<Sopt2<<endl;
+    //std::cout<<"Sopt2: "<<Sopt2<<std::endl;
     // If maximun strength was positive, use Sopt2.
     if (prevV > 0)
       Sopt = Sopt2;

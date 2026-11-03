@@ -36,6 +36,7 @@
 #include "vtkPolyDataWriter.h"
 
 #include <math.h>
+#include <iostream>
 
 vtkStandardNewMacro(vtkComputeAirwayWall);
 
@@ -454,7 +455,7 @@ int idx=0;
     loc2 = samples->GetValue(1);
 
     if (loc1>loc2 && loc2!= -1) {
-      cout<<"WARNING: Inner radius (loc1="<<loc1<<") is greater than outer radius (loc2="<<loc2<<")."<<endl;
+      std::cout<<"WARNING: Inner radius (loc1="<<loc1<<") is greater than outer radius (loc2="<<loc2<<")."<<std::endl;
       loc1=-1;
       loc2=-1;
     }
@@ -463,7 +464,7 @@ int idx=0;
     //  loc1 = radiusInner->GetValue(idx-1)/delta;
 
     //if (th ==0)
-    //  cout<<"Loc1: "<<loc1<<" "<<"Loc2: "<<loc2<<endl;
+    //  std::cout<<"Loc1: "<<loc1<<" "<<"Loc2: "<<loc2<<std::endl;
 
     //Take only into account good rays
     if (loc1 >0 && loc2 >0 ) {
@@ -762,7 +763,7 @@ int idx=0;
       lumenA->InsertNextValue(10000);
     }
     //Add points to final contour
-//    cout<<th<<" "<<loc1<<" "<<loc2<<endl;
+//    std::cout<<th<<" "<<loc1<<" "<<loc2<<std::endl;
      if (loc1 > 0) {
        radiusInner->InsertNextValue(loc1*delta);
        angleInner->InsertNextValue(th);
@@ -820,11 +821,11 @@ for (double th =-dth ; th <= 2*vtkMath::Pi(); th +=dth) {
 idx = 0;
 for (double th =0 ; th < 2*vtkMath::Pi(); th +=dth) {
   if (radiusInner->GetValue(idx) <=0) {
-    cout<<"Theta inner="<<th<<" Value="<<is->Evaluate(th)<<endl;
+    std::cout<<"Theta inner="<<th<<" Value="<<is->Evaluate(th)<<std::endl;
     radiusInner->SetValue(idx,is->Evaluate(th));
   }
   if (radiusOuter->GetValue(idx) <=0) {
-    cout<<"Th outer="<<th<<" Value="<<is->Evaluate(th)<<endl;
+    std::cout<<"Th outer="<<th<<" Value="<<is->Evaluate(th)<<std::endl;
     radiusOuter->SetValue(idx,os->Evaluate(th));
   }
   idx++;
@@ -1425,7 +1426,7 @@ void vtkComputeAirwayWall::RemoveOutliers(vtkDoubleArray *r) {
   e2r = e2r/tt;
 
   stdr = sqrt(e2r-meanr*meanr);
-  //cout<<"Robust mean = "<<meanr<<" Robust std = "<<stdr<<endl;
+  //std::cout<<"Robust mean = "<<meanr<<" Robust std = "<<stdr<<std::endl;
 
   //Set points to -1 that fall beyond the criteria
   for (int k=0; k<r->GetNumberOfTuples(); k++) {
@@ -1506,9 +1507,9 @@ meanLuminalI = (int) (meanLuminalI/lumenloc);
 if(this->WallThreshold <= meanLuminalI )
   {
   wallTh = this->WallThreshold + meanLuminalI;
-  //cout<<"Mean luminal I: "<<meanLuminalI<<endl;
-  //cout<<"Th floor: "<<this->WallThreshold<<endl;
-  //cout<<"Wall threhosld readjusted to: "<<wallTh<<endl;
+  //std::cout<<"Mean luminal I: "<<meanLuminalI<<std::endl;
+  //std::cout<<"Th floor: "<<this->WallThreshold<<std::endl;
+  //std::cout<<"Wall threhosld readjusted to: "<<wallTh<<std::endl;
   }
 else
   {
@@ -1525,7 +1526,7 @@ for (int k=0; k<nzeros; k++) {
   //Wall Candidate
   val = c->GetValue((int) loc);
   valg = cp->GetValue((int) loc);
-  //cout<<"Loc: "<<loc<<" Zero value: "<<val<<endl;
+  //std::cout<<"Loc: "<<loc<<" Zero value: "<<val<<std::endl;
   if (val>wallTh ) {
        //Wall center point (loc) has to be a maxima (cpp =< 0). We let inflection points pass.
         if (cpp->GetValue((int) loc) > 0) {
@@ -1560,10 +1561,10 @@ for (int k=0; k<nzeros; k++) {
     // Check that the inner wall location gradient is above the threshold.
     if (fabs(valg)<this->GradientThreshold)
 	    {
-	      //cout<<" Gradient= "<<fabs(valg)<<" at rmin="<<rmin<<endl;
+	      //std::cout<<" Gradient= "<<fabs(valg)<<" at rmin="<<rmin<<std::endl;
           continue;
 	    }
-            //cout<<"Find rmin: "<<rmin<<endl;
+            //std::cout<<"Find rmin: "<<rmin<<std::endl;
     }
 	//Check loc2 is in the allowed range
   if (int(loc2) >=ntuples || int(loc2) <0) {
@@ -1572,7 +1573,7 @@ for (int k=0; k<nzeros; k++) {
 	} else {
             val2 = c->GetValue((int) loc2);
             rmax=this->FindValue(c,(int) loc,(val+val2)/2);
-            //cout<<"Find rmax: "<<rmax<<endl;
+            //std::cout<<"Find rmax: "<<rmax<<std::endl;
 	}
     gzeros->Delete();
     //hzeros->Delete();
@@ -1970,7 +1971,7 @@ for (int i=0; i<numKernels-1; i++) {
          zc[0] = (-B + sqrt(res))/(2*A);
          zc[1] = (-B - sqrt(res))/(2*A);
        }
-       //cout<<"zc[0]: "<<zc[0]<<" zc[1]: "<<zc[1]<<endl;
+       //std::cout<<"zc[0]: "<<zc[0]<<" zc[1]: "<<zc[1]<<std::endl;
 
        for (int sol=0 ; sol<2; sol++) {
          if ((zc[sol]<(k+1) && zc[sol]>(k-1)) && (f1+f2)/2 > wallTh)
@@ -2096,7 +2097,7 @@ while (initIdx < np-1) {
 
    for (k =initIdx+1; k<np; k++) {
       val1 = c->GetValue(k);
-      //cout<<"k: "<<k<<" Val1: "<<val1<<endl;
+      //std::cout<<"k: "<<k<<" Val1: "<<val1<<std::endl;
       //Check for a change of sign
       if (val0*val1 <0) {
         val0 = c->GetValue(k-1);

@@ -7,6 +7,7 @@
 #include "itkImageRegionIterator.h"
 #include "cipChestConventions.h"
 #include "cipHelper.h"
+#include <iostream>
 
 namespace itk
 {
@@ -55,7 +56,7 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(MergeChestLabelMapsImageFilter, ImageToImageFilter);
+  itkTypeMacro(CIPMergeChestLabelMapsImageFilter, ImageToImageFilter);
   
   /** Image typedef support. */
   typedef cip::LabelMapType::PixelType                        PixelType;
