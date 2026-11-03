@@ -7,6 +7,7 @@
 #include "itkImageRegionIterator.h"
 #include "cipChestConventions.h"
 #include "cipHelper.h"
+#include <iostream>
 
 namespace itk
 {

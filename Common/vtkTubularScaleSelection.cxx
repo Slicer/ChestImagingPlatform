@@ -32,6 +32,7 @@
 #include "vnl/vnl_math.h"
 #include <math.h>
 #include "vtkNRRDExport.h"
+#include <iostream>
 #define VTK_EPS 1e-12
 
 vtkStandardNewMacro(vtkTubularScaleSelection);
@@ -145,11 +146,11 @@ void vtkTubularScaleSelectionExecute(vtkTubularScaleSelection *self, vtkImageDat
   double scale = initScale;
   int E = 0;
   for (int i=0; i<numScales; i++) {
-    //cout<<"Creating gtx for scale: "<<i<<"thread "<<id<<endl;
+    //std::cout<<"Creating gtx for scale: "<<i<<"thread "<<id<<std::endl;
     //fflush(stdout);
     gtx[i] = gageContextNew();
     if (gtx[i]==NULL) {
-      cout<<"We have a problem creating Context"<<endl;
+      std::cout<<"We have a problem creating Context"<<std::endl;
     }
     gageParmSet(gtx[i], gageParmRenormalize, AIR_TRUE); // slows things down if true
     if (!E) E |= !(pvl[i] = gagePerVolumeNew(gtx[i], nin, gageKindScl));
@@ -157,7 +158,7 @@ void vtkTubularScaleSelectionExecute(vtkTubularScaleSelection *self, vtkImageDat
     if (!E) E |= self->SettingContext(gtx[i],pvl[i],scale);
     scale = scale+scaleStep;
     if (E) {
-     cout<<"Error Setting Context for scale "<<i<<endl;
+     std::cout<<"Error Setting Context for scale "<<i<<std::endl;
      break;
     }
   }
@@ -177,7 +178,7 @@ void vtkTubularScaleSelectionExecute(vtkTubularScaleSelection *self, vtkImageDat
         if (!(count%target))
           {
           self->UpdateProgress(count/(50.0*target));
-          cout<<"Progress Update: "<<count/(50.0*target)<<endl;
+          std::cout<<"Progress Update: "<<count/(50.0*target)<<std::endl;
           }
         count++;
         }
@@ -203,7 +204,7 @@ void vtkTubularScaleSelectionExecute(vtkTubularScaleSelection *self, vtkImageDat
         scale = self->ScaleSelection(gtx,pvl,xyz,initScale,finalScale,scaleStep);
         *outPtr = scale;
         if (scale<1 && scale>=0)
-          cout<<"Something is weird: "<<scale<<endl;
+          std::cout<<"Something is weird: "<<scale<<std::endl;
         outPtr++;
         inPtId++;
        }
@@ -422,7 +423,7 @@ double vtkTubularScaleSelection::ScaleSelection(gageContext *gtx, gagePerVolume 
     if (!E) E |= gageUpdate(gtx);
     //heval = gageAnswerPointer(gtx, pvl, gageSclHessEval);
     gageProbe(gtx,Seed[0],Seed[1],Seed[2]);
-    //cout<<"Testing Scale: "<<S<<"  Eigenvalues: "<<heval[0]<<" "<<heval[1]<<" "<<heval[2]<<"  Mode: "<<this->Mode(heval)<<"  Disparity measure: "<< (heval[0] + heval[1])/2 - fabs(heval[2])<<endl;
+    //std::cout<<"Testing Scale: "<<S<<"  Eigenvalues: "<<heval[0]<<" "<<heval[1]<<" "<<heval[2]<<"  Mode: "<<this->Mode(heval)<<"  Disparity measure: "<< (heval[0] + heval[1])/2 - fabs(heval[2])<<std::endl;
 
     nextV = S*S*featureSign*this->Strength(heval);
     if (nextV > prevV && featureSign*heval[1]> 0 && featureSign*heval[1] > fabs(heval[2])) {

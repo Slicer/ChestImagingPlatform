@@ -39,6 +39,7 @@
 #include "vtkImageThreshold.h"
 #include "vtkImageSeedConnectivity.h"
 #include "vtkComputeCentroid.h"
+#include <iostream>
 
 vtkStandardNewMacro(vtkComputeAirwayWallPolyData);
 
@@ -127,7 +128,7 @@ void vtkComputeAirwayWallPolyData::ExecuteInformation()
 
  if (this->GetOutput()->GetPointData()->GetScalars("Mean") != NULL)
  {
-   cout<<"Allocated"<<endl;
+   std::cout<<"Allocated"<<std::endl;
  }
  
  
@@ -244,8 +245,8 @@ int vtkComputeAirwayWallPolyData::RequestData(vtkInformation *request,
   
   output->DeepCopy(input);
   
-  //cout<<"Spacing: "<<sp[0]<<" "<<sp[1]<<" "<<sp[2]<<endl;
-  ///cout<<"Origin: "<<orig[0]<<" "<<orig[1]<<" "<<orig[2]<<endl;
+  //std::cout<<"Spacing: "<<sp[0]<<" "<<sp[1]<<" "<<sp[2]<<std::endl;
+  ///std::cout<<"Origin: "<<orig[0]<<" "<<orig[1]<<" "<<orig[2]<<std::endl;
   
   double resolution = this->Resolution;
 
@@ -289,7 +290,7 @@ int vtkComputeAirwayWallPolyData::RequestData(vtkInformation *request,
         this->SetAxisMode(VTK_HESSIAN);
        } else {
         reslicer->ComputeAxesOff();
-	cout<<"Using vectors"<<endl;
+	std::cout<<"Using vectors"<<std::endl;
        }
       break;
    }
@@ -401,7 +402,7 @@ int vtkComputeAirwayWallPolyData::RequestData(vtkInformation *request,
   for (vtkIdType k=0; k<npts; k++) {
   //for (vtkIdType k=400; k<403; k++) {
     input->GetPoints()->GetPoint(k,p);
-    cout<<"Processing point "<<k<<" out of "<<npts<<endl;
+    std::cout<<"Processing point "<<k<<" out of "<<npts<<std::endl;
     
    
   //reslicer->SetCenter(0.5+(p[0]+orig[0])/sp[0],511-((p[1]+orig[1])/sp[1])+0.5,(p[2]-orig[2])/sp[2]);
@@ -425,7 +426,7 @@ int vtkComputeAirwayWallPolyData::RequestData(vtkInformation *request,
        z[0]=this->AxisArray->GetComponent(k,0);
        z[1]=this->AxisArray->GetComponent(k,1);
        z[2]=this->AxisArray->GetComponent(k,2);
-       //cout<<"Tangent: "<<z[0]<<" "<<z[1]<<" "<<z[2]<<endl;
+       //std::cout<<"Tangent: "<<z[0]<<" "<<z[1]<<" "<<z[2]<<std::endl;
        vtkMath::Perpendiculars(z,x,y,0);
        reslicer->SetXAxis(x);
        reslicer->SetYAxis(y);
@@ -435,7 +436,7 @@ int vtkComputeAirwayWallPolyData::RequestData(vtkInformation *request,
        z[0]=input->GetPointData()->GetVectors()->GetComponent(k,0);
        z[1]=input->GetPointData()->GetVectors()->GetComponent(k,1);
        z[2]=input->GetPointData()->GetVectors()->GetComponent(k,2);
-       //cout<<"Tangent: "<<z[0]<<" "<<z[1]<<" "<<z[2]<<endl;
+       //std::cout<<"Tangent: "<<z[0]<<" "<<z[1]<<" "<<z[2]<<std::endl;
 
        vtkMath::Perpendiculars(z,x,y,0);
        reslicer->SetXAxis(x);
@@ -444,9 +445,9 @@ int vtkComputeAirwayWallPolyData::RequestData(vtkInformation *request,
        break;
    }
 
-   //cout<<"Before reslice"<<endl;
+   //std::cout<<"Before reslice"<<std::endl;
    reslicer->Update();
-   //cout<<"After reslice"<<endl;
+   //std::cout<<"After reslice"<<std::endl;
    
    vtkComputeAirwayWall *worker = this->WallSolver;
    worker->SetInputData(reslicer->GetOutput());
@@ -546,13 +547,13 @@ void vtkComputeAirwayWallPolyData::ComputeWallFromSolver(vtkComputeAirwayWall *w
     worker->SetMultiplicativeFactor(ml);
   }
   
-  //cout<<"Update solver"<<endl;
+  //std::cout<<"Update solver"<<std::endl;
   worker->Update();
-  //cout<<"Done solver"<<endl;
+  //std::cout<<"Done solver"<<std::endl;
   
   if (eifit != NULL)
   {
-    //cout<<"Ellipse fitting 1: "<<worker->GetInnerContour()->GetNumberOfPoints()<<endl;
+    //std::cout<<"Ellipse fitting 1: "<<worker->GetInnerContour()->GetNumberOfPoints()<<std::endl;
     if (worker->GetInnerContour()->GetNumberOfPoints() >= 3)
     {
       eifit->SetInputData(worker->GetInnerContour());
@@ -563,14 +564,14 @@ void vtkComputeAirwayWallPolyData::ComputeWallFromSolver(vtkComputeAirwayWall *w
   
   if (eofit !=NULL)
   {
-    //cout<<"Ellipse fitting 2: "<<worker->GetOuterContour()->GetNumberOfPoints()<<endl;
+    //std::cout<<"Ellipse fitting 2: "<<worker->GetOuterContour()->GetNumberOfPoints()<<std::endl;
     if (worker->GetOuterContour()->GetNumberOfPoints() >= 3)
     {
       eofit->SetInputData(worker->GetOuterContour());
       eofit->Update();
     }
   }
-  //cout<<"Done ellipse fitting"<<endl;
+  //std::cout<<"Done ellipse fitting"<<std::endl;
 
 }
 

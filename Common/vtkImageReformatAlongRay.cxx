@@ -24,6 +24,7 @@
 #include "teem/ell.h"
 
 #include <math.h>
+#include <iostream>
 
 vtkStandardNewMacro(vtkImageReformatAlongRay);
 
@@ -146,7 +147,7 @@ void vtkImageReformatAlongRay::ExecuteDataWithInformation(vtkDataObject *out,
   vtkImageData *output = this->GetOutput();
   output->AllocateScalars(outInfo);
   //vtkIndent ident;
-  //output->PrintSelf(cout,ident);
+  //output->PrintSelf(std::cout,ident);
 
   // Convert input to nrrd
   int dims[3];
@@ -173,7 +174,7 @@ void vtkImageReformatAlongRay::ExecuteDataWithInformation(vtkDataObject *out,
   }
 
   if(nrrdWrap_nva(this->nin,data,type,3,size)) {
-	cout<<"Error with nrrdWrap"<<endl;
+	std::cout<<"Error with nrrdWrap"<<std::endl;
         //sprintf(err,"%s:",me);
 	//biffAdd(NRRD, err); return;
   }
@@ -212,8 +213,8 @@ void vtkImageReformatAlongRay::ExecuteDataWithInformation(vtkDataObject *out,
   //Loop through ray points
   double dp[3],vp[3],xp[3];
   // Delta increment in the point
-  //cout<<"Theta: "<<this->Theta;
-  //cout<<"Center: "<<this->Center[0]<<" "<<this->Center[1]<<" "<<this->Center[2]<<endl;
+  //std::cout<<"Theta: "<<this->Theta;
+  //std::cout<<"Center: "<<this->Center[0]<<" "<<this->Center[1]<<" "<<this->Center[2]<<std::endl;
   vp[0] =  cos(this->Theta);
   vp[1] =  sin(this->Theta);
   vp[2] = 0;

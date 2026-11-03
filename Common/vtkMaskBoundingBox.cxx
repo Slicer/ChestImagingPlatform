@@ -3,6 +3,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkImageToImageStencil.h>
 #include "vtkImageData.h"
+#include <iostream>
 
 vtkStandardNewMacro(vtkMaskBoundingBox);
 
@@ -78,7 +79,7 @@ void vtkMaskBoundingBox::Compute()
     this->BoundingBox[2*i+1]=VTK_INT_MIN;
     } 
   
-  cout<<"Starting looping..."<<endl;
+  std::cout<<"Starting looping..."<<std::endl;
   for (zidx = ext[4]; zidx <= ext[5]; zidx++)
     {
     for (yidx = ext[2]; yidx <= ext[3]; yidx++)
@@ -93,7 +94,7 @@ void vtkMaskBoundingBox::Compute()
 	        }
         else
           {  
-	          //cout<<"r1: "<<r1<<"  r2: "<<r2<<" iter: "<<iter<<endl;
+	          //std::cout<<"r1: "<<r1<<"  r2: "<<r2<<" iter: "<<iter<<std::endl;
 	    
     	    if (r1<this->BoundingBox[0])
     	       this->BoundingBox[0]=r1;
@@ -116,7 +117,7 @@ void vtkMaskBoundingBox::Compute()
       
    for (int i =0 ;i<6;i++)
      {
-     cout<<"BB "<<i<<": "<<this->BoundingBox[i]<<endl;
+     std::cout<<"BB "<<i<<": "<<this->BoundingBox[i]<<std::endl;
      }
  }
 

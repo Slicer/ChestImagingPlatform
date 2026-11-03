@@ -13,6 +13,7 @@
 #include "cipNewtonOptimizer.h"
 #include <vnl/algo/vnl_matrix_inverse.h>
 #include <vnl/algo/vnl_symmetric_eigensystem.h>
+#include <iostream>
 
 
 template < unsigned int Dimension >

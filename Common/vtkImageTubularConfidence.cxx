@@ -39,6 +39,7 @@
 #include "vtkTubularScaleSelection.h"
 #include "vtkExtractAirwayTree.h"
 #include "vtkMath.h"
+#include <iostream>
 
 vtkStandardNewMacro(vtkImageTubularConfidence);
 
@@ -227,7 +228,7 @@ void vtkImageTubularConfidenceExecute(vtkImageTubularConfidence *self, vtkImageD
         if (!(count%target))
           {
           self->UpdateProgress(count/(50.0*target));
-          cout<<"Progress Update: "<<count/(50.0*target)<<endl;
+          std::cout<<"Progress Update: "<<count/(50.0*target)<<std::endl;
           }
         count++;
         }

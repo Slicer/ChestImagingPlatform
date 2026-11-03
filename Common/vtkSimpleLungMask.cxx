@@ -37,6 +37,7 @@
 #include <vtkInformation.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <math.h>
+#include <iostream>
 
 vtkStandardNewMacro(vtkSimpleLungMask);
 
@@ -147,8 +148,8 @@ void vtkSimpleLungMask::ComputeCentroids(vtkImageData *in, int LC[3], int RC[3])
         extR[axis*2] = (int) (ext[axis*2 + 1]/2 + 0.5);
         extL[axis*2+1] = extR[axis*2]-1;
     }
-    cout<<"Extent left: "<<extL[0]<<"-"<<extL[1]<<" "<<extL[2]<<"-"<<extL[3]<<" "<<extL[4]<<"-"<<extL[5]<<endl;
-    cout<<"Extent right: "<<extR[0]<<"-"<<extR[1]<<" "<<extR[2]<<"-"<<extL[3]<<" "<<extR[4]<<"-"<<extR[5]<<endl;
+    std::cout<<"Extent left: "<<extL[0]<<"-"<<extL[1]<<" "<<extL[2]<<"-"<<extL[3]<<" "<<extL[4]<<"-"<<extL[5]<<std::endl;
+    std::cout<<"Extent right: "<<extR[0]<<"-"<<extR[1]<<" "<<extR[2]<<"-"<<extL[3]<<" "<<extR[4]<<"-"<<extR[5]<<std::endl;
 
     //Before computing centroids:
     this->ComputeCentroid(in,extL,LC);
@@ -214,7 +215,7 @@ vtkImageData *vtkSimpleLungMask::PreVolumeProcessing(vtkImageData *in, int &ZCen
     th->SetInput(in);
     th->SetInsideValue(1);
     th->SetOutsideValue(0);
-    cout<<"Updating Otsu"<<endl;
+    std::cout<<"Updating Otsu"<<std::endl;
     th->Update();
     this->LungThreshold = th->GetThreshold();
     */
@@ -266,10 +267,10 @@ vtkImageData *vtkSimpleLungMask::PreVolumeProcessing(vtkImageData *in, int &ZCen
     bgrm->Delete();
 
     //Compute centroid
-    cout<<"Compute centroids"<<endl;
+    std::cout<<"Compute centroids"<<std::endl;
     this->ComputeCentroids(th->GetOutput(), this->LCentroid, this->RCentroid);
-    cout<<"CentroidL: "<<LCentroid[0]<<" "<<LCentroid[1]<<" "<<LCentroid[2]<<endl;
-    cout<<"CentroidR: "<<RCentroid[0]<<" "<<RCentroid[1]<<" "<<RCentroid[2]<<endl;
+    std::cout<<"CentroidL: "<<LCentroid[0]<<" "<<LCentroid[1]<<" "<<LCentroid[2]<<std::endl;
+    std::cout<<"CentroidR: "<<RCentroid[0]<<" "<<RCentroid[1]<<" "<<RCentroid[2]<<std::endl;
 
     // Make sure we get only the components connected to the centroid
     // Here we should have a decent lung mask
@@ -281,7 +282,7 @@ vtkImageData *vtkSimpleLungMask::PreVolumeProcessing(vtkImageData *in, int &ZCen
     connect->SetOutputUnconnectedValue(0);
     connect->AddSeed(this->LCentroid[0],this->LCentroid[1],this->LCentroid[2]);
     connect->AddSeed(this->RCentroid[0],this->RCentroid[1],this->RCentroid[2]);
-    cout<<"CC"<<endl;
+    std::cout<<"CC"<<std::endl;
 
     connect->Update();
 
@@ -372,7 +373,7 @@ int vtkSimpleLungMask::SliceProcessing(vtkImageData *in,vtkImageData *out, int z
   int LC[3];
   int RC[3];
   this->ComputeCentroids(in, LC, RC);
-  //cout<<"Centroid Slice processing: "<<LC[0]<<" "<<LC[1]<<" "<<RC[0]<<" "<<RC[1]<<endl;
+  //std::cout<<"Centroid Slice processing: "<<LC[0]<<" "<<LC[1]<<" "<<RC[0]<<" "<<RC[1]<<std::endl;
   if ((LC[0] ==0 && LC[1] ==0) &&
         (RC[0]==0 && RC[1]==0))
         return 0;
@@ -541,11 +542,11 @@ void vtkSimpleLungMask::ExecuteDataWithInformation(vtkDataObject *output, vtkInf
   vtkImageData *sliceMask = NULL; //Mask for slice processing 2D
   int ZCentroid;
 
-  //cout<<"Before prevolume processing"<<endl;
+  //std::cout<<"Before prevolume processing"<<std::endl;
   this->UpdateProgress(0.1);
   preMask = this->PreVolumeProcessing(inData,ZCentroid);
   this->UpdateProgress(0.4);
-  //cout<<"Done prevolume"<<endl;
+  //std::cout<<"Done prevolume"<<std::endl;
 
   /*******************************
   int ext[6];
@@ -607,15 +608,15 @@ void vtkSimpleLungMask::ExecuteDataWithInformation(vtkDataObject *output, vtkInf
   sliceMask->Delete();
 
   // Post volume processing
-  //cout<<"Post volume processing ..."<<endl;
+  //std::cout<<"Post volume processing ..."<<std::endl;
   //this->PostVolumeProcessing(preMask,outData);
-  //cout<<"postvolume DONE"<<endl;
+  //std::cout<<"postvolume DONE"<<std::endl;
   //Here final result should be in outData;
   *************************************************/
 
   // Extract trachea. Based on preMask analysis, relabel output.
-  //cout<<"Extracting Trachea"<<endl;
-  cout<<"Extracting Trachea"<<endl;
+  //std::cout<<"Extracting Trachea"<<std::endl;
+  std::cout<<"Extracting Trachea"<<std::endl;
   this->ExtractTrachea(preMask);
   this->UpdateProgress(0.5);
 
@@ -648,14 +649,14 @@ void vtkSimpleLungMask::ExecuteDataWithInformation(vtkDataObject *output, vtkInf
   con->SetFunctionToRemoveIslands();
   con->SetMinSize(1000);
   con->SliceBySliceOn();
-  cout<<"Removing Island"<<endl;
+  std::cout<<"Removing Island"<<std::endl;
   con->Update();
 
   this->UpdateProgress(0.6);
 
   //Clean potential crap from Image Connectivity
   short *conPtr = (short *) con->GetOutput()->GetScalarPointer();
-  cout<<"Cleaning Remove Islands"<<endl;
+  std::cout<<"Cleaning Remove Islands"<<std::endl;
   outPtr = (short *) outData->GetScalarPointer();
   for (int i=0; i<outData->GetNumberOfPoints();i++) {
     if (*conPtr == this->WholeLungLabel || *conPtr == this->TracheaLabel)
@@ -756,7 +757,7 @@ void vtkSimpleLungMask::ExecuteDataWithInformation(vtkDataObject *output, vtkInf
   air->Delete();
 
   // Slip the lung in three regions
-  cout<<"Split Lung in regions"<<endl;
+  std::cout<<"Split Lung in regions"<<std::endl;
   this->SplitLung(outData);
   this->UpdateProgress(0.95);
 
@@ -846,23 +847,23 @@ void vtkSimpleLungMask::FindTracheaTopCoordinates(vtkImageData *in,int initZ, in
   do {
       testext[4]=k;
       testext[5]=k;
-      //cout<<"Ready to copy buffer to slice "<<k<<endl;
+      //std::cout<<"Ready to copy buffer to slice "<<k<<std::endl;
       this->CopyToBuffer(in,slice1,testext);
       testext[4]=0;
       testext[5]=0;
       slice1->SetExtent(testext);
       conk->SetInputData(slice1);
-      //cout<<"Updating Identify island"<<endl;
+      //std::cout<<"Updating Identify island"<<std::endl;
       conk->Update();
       testext[4]=k+sign;
       testext[5]=k+sign;
-      //cout<<"Ready to copy buffer to slice "<<k+sign<<endl;
+      //std::cout<<"Ready to copy buffer to slice "<<k+sign<<std::endl;
       this->CopyToBuffer(in,slice2,testext);
       testext[4]=0;
       testext[5]=0;
       slice2->SetExtent(testext);
       conkp1->SetInputData(slice2);
-      //cout<<"Updating Identify island"<<endl;
+      //std::cout<<"Updating Identify island"<<std::endl;
       conkp1->Update();
 
       //Loop through each CC in slice k
@@ -877,11 +878,11 @@ void vtkSimpleLungMask::FindTracheaTopCoordinates(vtkImageData *in,int initZ, in
       }
       */
       this->Histogram(conk->GetOutput(),hist,0,499);
-      cout<<"Histogram= ";
+      std::cout<<"Histogram= ";
       for (int i=0;i<20;i++) {
-	cout<<hist[i]<<" ";
+	std::cout<<hist[i]<<" ";
       }
-      cout<<endl;
+      std::cout<<std::endl;
 
       for (short cc=1;cc<500;cc++) {
 	int countk=hist[cc];
@@ -889,12 +890,12 @@ void vtkSimpleLungMask::FindTracheaTopCoordinates(vtkImageData *in,int initZ, in
 	  continue;
 	}
         if (countk*sp[0]*sp[1] > this->TracheaAreaTh) {
-	  cout<<"cc ="<<cc<<" Too big to be the trachea countk "<<countk<<endl;
+	  std::cout<<"cc ="<<cc<<" Too big to be the trachea countk "<<countk<<std::endl;
           continue;
 	}
 
 	if (countk < 10) {
-	  cout <<"cc="<<cc<<" Too small "<<countk<<endl;
+	  std::cout <<"cc="<<cc<<" Too small "<<countk<<std::endl;
 	}
 
         th->SetInputConnection(conk->GetOutputPort());
@@ -908,17 +909,17 @@ void vtkSimpleLungMask::FindTracheaTopCoordinates(vtkImageData *in,int initZ, in
 	  continue;
         }
         //Compute volume for that cc
-	cout<<"Tentative Centroid: "<<C[0]<<" "<<C[1]<<" "<<C[2]<<endl;
+	std::cout<<"Tentative Centroid: "<<C[0]<<" "<<C[1]<<" "<<C[2]<<std::endl;
 	//Check cc at centroid location for slice k+sign
 	cckp1 = conkp1->GetOutput()->GetScalarComponentAsFloat(C[0],C[1],C[2],0);
 	if (cckp1 == 0) {
 	  continue;
 	}
         int countkp1=this->CountPixels(conkp1->GetOutput(),cckp1);
-	cout<<"Count for that centroid: "<<countkp1<<endl;
+	std::cout<<"Count for that centroid: "<<countkp1<<std::endl;
 
 	if ((fabs(double(countkp1-countk))/(0.5*(countkp1+countk)) < 0.2) & (countkp1 * sp[0]*sp[1] <= this->TracheaAreaTh) & (countkp1 > 10) ) {
-	  cout<<"Trachea found at "<<k<<endl;
+	  std::cout<<"Trachea found at "<<k<<std::endl;
 	  C[2]=k;
 	  delete [] hist;
           slice1->Delete();
@@ -999,8 +1000,8 @@ void vtkSimpleLungMask::ExtractTrachea(vtkImageData *in) {
         sign = 1;
     }
 
-    //cout<<"Direction: "<<sign<<endl;
-    //cout<<"Init Z: "<<initZ<<" End Z:"<<endZ<<endl;
+    //std::cout<<"Direction: "<<sign<<std::endl;
+    //std::cout<<"Init Z: "<<initZ<<" End Z:"<<endZ<<std::endl;
 
     // Extract slices from initZ: do slice by slice analysis.
     int testext[6];
@@ -1037,7 +1038,7 @@ void vtkSimpleLungMask::ExtractTrachea(vtkImageData *in) {
     this->FindTracheaTopCoordinates(in,initZ,endZ,sign,C);
 
     if (C[0] + C[1] + C[2] == 0) {
-      cout<<"Trachea not found"<<endl;
+      std::cout<<"Trachea not found"<<std::endl;
       slice->Delete();
       return;
     }
@@ -1049,10 +1050,10 @@ void vtkSimpleLungMask::ExtractTrachea(vtkImageData *in) {
         testext[5] = k;
             // Check pixval in seed to see if we have to stop
             // We should be always inside the trachea until we branch off.
-            //cout<<"Check slice #: "<<k<<endl;
+            //std::cout<<"Check slice #: "<<k<<std::endl;
             C[2]=k;
             if (in->GetScalarComponentAsFloat(C[0],C[1],C[2],0) == 0 ) {
-                cout<<"Out of trachea boundaries at "<<k<<endl;
+                std::cout<<"Out of trachea boundaries at "<<k<<std::endl;
                 break;
             }
 
@@ -1079,11 +1080,11 @@ void vtkSimpleLungMask::ExtractTrachea(vtkImageData *in) {
             cc->SetInputConnectValue(this->WholeLungLabel);
             cc->SetOutputConnectedValue(this->WholeLungLabel);
             cc->SetOutputUnconnectedValue(0);
-            //cout<<"Doing CC"<<endl;
+            //std::cout<<"Doing CC"<<std::endl;
             cc->Update();
 	          di_er->Delete();
-            //cout<<"CC done"<<endl;
-            //cout<<"Getting inPtr"<<endl;
+            //std::cout<<"CC done"<<std::endl;
+            //std::cout<<"Getting inPtr"<<std::endl;
             inPtr = (unsigned char *)cc->GetOutput()->GetScalarPointer(0,0,0);
 
 	    //Second stop condition: number of pixel selected as trachea lower than a value
@@ -1097,7 +1098,7 @@ void vtkSimpleLungMask::ExtractTrachea(vtkImageData *in) {
 	    count = (int) (count * sp[0]*sp[1]);
 
 	    if (count > this->TracheaAreaTh) {
-        cout<<"We walk into the lung at "<<k<<endl;
+        std::cout<<"We walk into the lung at "<<k<<std::endl;
         cc->Delete();
         break;
 	    }
@@ -1112,7 +1113,7 @@ void vtkSimpleLungMask::ExtractTrachea(vtkImageData *in) {
       
 	    inPtr = (unsigned char *)di_er2->GetOutput()->GetScalarPointer(0,0,0);
 	    outPtr = (unsigned char *)in->GetScalarPointerForExtent(testext);
-	    //cout<<"Copy process input in output"<<endl;
+	    //std::cout<<"Copy process input in output"<<std::endl;
       for (int i = 0; i< numPoints; i++) {
           if ((short) (*inPtr) == this->WholeLungLabel)
               *outPtr = (unsigned char) (this->UcharTracheaLabel);
@@ -1125,7 +1126,7 @@ void vtkSimpleLungMask::ExtractTrachea(vtkImageData *in) {
 	    testext[4]=0;
 	    testext[5]=0;
       this->ComputeCentroid(di_er2->GetOutput(),testext,C);
-      //cout<<"New seed: "<<C[0]<<" "<<C[1]<<" "<<C[2]<<endl;
+      //std::cout<<"New seed: "<<C[0]<<" "<<C[1]<<" "<<C[2]<<std::endl;
       // Delete Objects
       di_er2->Delete();
 
@@ -1165,8 +1166,8 @@ void vtkSimpleLungMask::ExtractTracheaOLD(vtkImageData *in) {
         sign = 1;
     }
 
-    //cout<<"Direction: "<<sign<<endl;
-    //cout<<"Init Z: "<<initZ<<" End Z:"<<endZ<<endl;
+    //std::cout<<"Direction: "<<sign<<std::endl;
+    //std::cout<<"Init Z: "<<initZ<<" End Z:"<<endZ<<std::endl;
 
     // Extract slices from initZ: do slice by slice analysis.
     int testext[6];
@@ -1207,7 +1208,7 @@ void vtkSimpleLungMask::ExtractTracheaOLD(vtkImageData *in) {
             C[1] = 0;
             C[2] = 0;
             this->ComputeCentroid(in,testext,C);
-            //cout<<"Testing for init trachea: "<<C[0]<<" "<<C[1]<<" "<<C[2]<<endl;
+            //std::cout<<"Testing for init trachea: "<<C[0]<<" "<<C[1]<<" "<<C[2]<<std::endl;
             if (C[0] + C[1] + C[2] == 0) {
                 k = k + sign;
                 continue;
@@ -1216,16 +1217,16 @@ void vtkSimpleLungMask::ExtractTracheaOLD(vtkImageData *in) {
 	      k = k + sign;
 	      continue;
             }
-            cout<<"Trachea found at "<<k<<endl;
+            std::cout<<"Trachea found at "<<k<<std::endl;
             flag = 1;
             k = k-sign;
         } else {
             // Check pixval in seed to see if we have to stop
             // We should be always inside the trachea until we branch off.
-            //cout<<"Check slice #: "<<k<<endl;
+            //std::cout<<"Check slice #: "<<k<<std::endl;
             C[2]=k;
             if (in->GetScalarComponentAsFloat(C[0],C[1],C[2],0) == 0 ) {
-                cout<<"Out of trachea boundaries at "<<k<<endl;
+                std::cout<<"Out of trachea boundaries at "<<k<<std::endl;
                 break;
             }
 
@@ -1252,11 +1253,11 @@ void vtkSimpleLungMask::ExtractTracheaOLD(vtkImageData *in) {
             cc->SetInputConnectValue(this->WholeLungLabel);
             cc->SetOutputConnectedValue(this->WholeLungLabel);
             cc->SetOutputUnconnectedValue(0);
-            //cout<<"Doing CC"<<endl;
+            //std::cout<<"Doing CC"<<std::endl;
             cc->Update();
-            //cout<<"CC done"<<endl;
+            //std::cout<<"CC done"<<std::endl;
             outPtr = (unsigned char *)in->GetScalarPointerForExtent(testext);
-            //cout<<"Getting inPtr"<<endl;
+            //std::cout<<"Getting inPtr"<<std::endl;
             inPtr = (unsigned char *)cc->GetOutput()->GetScalarPointer(0,0,0);
 
 	    //Second stop condition: number of pixel selected as trachea lower than a value
@@ -1270,7 +1271,7 @@ void vtkSimpleLungMask::ExtractTracheaOLD(vtkImageData *in) {
 	    count = (int) (count * sp[0]*sp[1]);
 
 	    if (count > this->TracheaAreaTh) {
-	    	cout<<"We walk into the lung at "<<k<<endl;
+	    	std::cout<<"We walk into the lung at "<<k<<std::endl;
 		break;
 	    }
               // Dilate to compensate for the erosion:
@@ -1281,7 +1282,7 @@ void vtkSimpleLungMask::ExtractTracheaOLD(vtkImageData *in) {
             di_er->Update();
 	    cc->Delete();
 	    inPtr = (unsigned char *)di_er->GetOutput()->GetScalarPointer(0,0,0);
-	    //cout<<"Copy process input in output"<<endl;
+	    //std::cout<<"Copy process input in output"<<std::endl;
             for (int i = 0; i< numPoints; i++) {
                 if ((short) (*inPtr) == this->WholeLungLabel)
                     *outPtr = (unsigned char) (this->UcharTracheaLabel);
@@ -1294,7 +1295,7 @@ void vtkSimpleLungMask::ExtractTracheaOLD(vtkImageData *in) {
 	    testext[4]=0;
 	    testext[5]=0;
             this->ComputeCentroid(di_er->GetOutput(),testext,C);
-            //cout<<"New seed: "<<C[0]<<" "<<C[1]<<" "<<C[2]<<endl;
+            //std::cout<<"New seed: "<<C[0]<<" "<<C[1]<<" "<<C[2]<<std::endl;
             // Delete Objects
             di_er->Delete();
         }
@@ -1335,8 +1336,8 @@ void vtkSimpleLungMask::ExtractUpperTrachea(vtkImageData *outData) {
 
     int k =this->TracheaInitZ;
     int foundTopLung =0;
-    cout<<"Extracing upper trachea"<<endl;
-    cout<<"Init Z: "<<k<<" sign: "<<sign<<endl;
+    std::cout<<"Extracing upper trachea"<<std::endl;
+    std::cout<<"Init Z: "<<k<<" sign: "<<sign<<std::endl;
     do {
     testext[4]=k;
     testext[5]=k;
@@ -1354,7 +1355,7 @@ void vtkSimpleLungMask::ExtractUpperTrachea(vtkImageData *outData) {
         if (this->TracheaLabel == (short) (*outPtr))
           {
           *outPtr = (this->UpperTracheaLabel);
-           //cout<<"Replacing lung label"<<endl;
+           //std::cout<<"Replacing lung label"<<std::endl;
           }
         }
      outPtr++;
@@ -1391,7 +1392,7 @@ void vtkSimpleLungMask::SplitLung(vtkImageData *outData) {
     double svtk[4];
     this->GetRasToVtk()->MultiplyPoint(saxis,svtk);
     int IS; //flag to now if the Volumes in memory is IS or SI
-    //cout<<"S vtk axis: "<<svtk[0]<<" "<<svtk[1]<<" "<<svtk[2]<<endl;
+    //std::cout<<"S vtk axis: "<<svtk[0]<<" "<<svtk[1]<<" "<<svtk[2]<<std::endl;
     if (svtk[2]<0)
         IS =0;
      else

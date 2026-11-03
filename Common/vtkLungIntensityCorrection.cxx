@@ -23,6 +23,7 @@
 #include "vtkExecutive.h"
 
 #include <math.h>
+#include <iostream>
 
 vtkStandardNewMacro(vtkLungIntensityCorrection);
 
@@ -213,7 +214,7 @@ void vtkLungIntensityCorrectionExecute(vtkLungIntensityCorrection *self,
   for (idZ = outExt[4]; idZ <= outExt[5]; idZ++)
     {
     idx = 0;
-    cout<<"Slice "<<idZ<<endl;
+    std::cout<<"Slice "<<idZ<<std::endl;
     for (idY = outExt[2]; idY <= outExt[3]; idY++)
       {
       if (!id) 
@@ -289,7 +290,7 @@ void vtkLungIntensityCorrectionExecute(vtkLungIntensityCorrection *self,
         if (nvalue > 0)
           {
            value = value/nvalue;
-           //cout <<"Value: "<<value<<endl;
+           //std::cout <<"Value: "<<value<<std::endl;
 
            //Fill matrices to solve LS problem
            xt[idx][0] = idY;
@@ -350,8 +351,8 @@ void vtkLungIntensityCorrectionExecute(vtkLungIntensityCorrection *self,
            dcvalue = (m*minY+n);
          break;
       }
-    cout<<"parameters (m,n): "<<m<<" "<<n<<endl;  
-    cout<<"dcvalue: "<<dcvalue<<" minY: "<<minY<<" maxY:"<<maxY<<endl;
+    std::cout<<"parameters (m,n): "<<m<<" "<<n<<std::endl;  
+    std::cout<<"dcvalue: "<<dcvalue<<" minY: "<<minY<<" maxY:"<<maxY<<std::endl;
 
     for (idY = outExt[2]; idY <= outExt[3]; idY++)
       {
